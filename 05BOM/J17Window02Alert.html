@@ -5,14 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>J17Window02Alert.html</title>
   <script>
+    /*
+    JS에서 객체는 다음과 같이 () 중괄호를 이용해서 만들 수 있다. 앞에 선언된 변수가 객체의 
+    이름이 되고, 각 익명함수 앞의 Key(라벨)를 통해 Value(함수)를 호출할 수 있다. 
+    */
     var fn = {
+      /*
+      alert(): 대화상자를 띄우는 함수. 메시지를 표시하고 확인 버튼을 제공한다. 
+      */
       login: function() {
+        //아이디 입력상자의 DOM을 얻어옴 
         var user = document.getElementById('user');
+        //입력상자에 입력된 값이 있는지 확인 
         if(user.value == '') {
+          //입력값이 없으면 경고창으로 알림 
           window.alert('아이디를 입력해 주세요');
+          //입력상자로 포커스 이동 
           user.focus();
         }
       },
+      /*
+      confirm(): 대화상자를 띄우는 함수. 메시지를 표시하고 확인 버튼과 취소 버튼을 제공한다. 
+      */
       drop: function() {
         var answer = window.confirm('정말 삭제하시겠습니까?');
         if(answer==true) {
@@ -22,13 +36,18 @@
           alert('삭제가 취소되었습니다.');
         }
       },
+      /*
+      prompt(): 대화상자를 띄우는 함수. 메시지를 표시하고 입력상자를 제공한다. 디폴트값을 지정할 수 있다. 
+      */
       insertName: function() {
+        //디폴트 값이 없으므로 빈 상태로 대화상자 표시 
         var name = window.prompt('이름을 입력해 주세요');
         window.alert('입력한 이름은 ' + name + '입니다.');
       },
       insertAge: function() {
+        //두번째 인자가 있으므로 디폴트 값을 20으로 지정하고 대화상자 표시 
         var age = window.prompt('나이를 입력해 주세요', '20');
-        window.alert('당신의 10년후 ' + window.parseInt(age) + 10 + '살입니다.');
+        window.alert('당신은 10년후 ' + (window.parseInt(age) + 10) + '살입니다.');
       }
     }
   </script>
@@ -39,7 +58,9 @@
   <h3>대화 상자(alert, confirm, prompt)</h3>
 
   아이디 : <input type="text" id="user" />
-
+  <!-- 
+  객체의 이름이 fn이므로 fn.키값()과 같이 호출할 수 있다. 
+  -->
   <input type="button" value="로그인" onclick="fn.login();" />
   <input type="button" value="삭제하기" onclick="fn.drop();" />
   <input type="button" value="이름입력하기" onclick="javascript:fn.insertName();" />
