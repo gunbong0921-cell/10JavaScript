@@ -5,17 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>J16DOM04.html</title>
   <script>
+    //전역변수 : 색깔로 구성된 배열 
     var myColor = ['red', 'green', 'blue', 'violet'];
     var cnt = 0;
     function createDOM() {
+      //body 태그의 DOM을 얻어옴 
       var myBody = document.getElementById('myBody');
-      var myDiv = document.createElement('div');
+      //div 엘리먼트를 동적으로 생성 
+      var newDiv = document.createElement('div');
+      //div 태그 사이에 텍스트 추가 
       newDiv.innerHTML = '새로 생성된 div입니다.';
-      
+      //id속성 및 속성값 추가 
+      newDiv.setAttribute('id', 'myDiv');
+      /*
+      배경색 지정시 증가연산자가 전위에 있으므로 cnt값이 먼저 증가한 후 4로 %연산한다.
+      그러면 0~3까지의 값이 토글된다. 
+      */
+      newDiv.style.backgroundColor = myColor[++cnt%4];
+      //마우스 커서의 모양을 손가락으로 지정
+      newDiv.style.cursor = 'pointer';
+      //생성된 div 태그를 클릭하면 자신을 제거하는 이벤트 핸들러 추가 
+      newDiv.onclick = function() {
+        //클릭한 요소의 부모요소를 얻어와서 변수에 저장. 즉 body태그. 
+        var pe = this.parentElement;
+        //pe의 자식요소 중 this를 제거한다. 
+        pe.removeChild(this);
+        //즉 클릭한 div 태그 자신을 동적으로 삭제한다. 
+      };
+      //body 태그 하위에 자식요소로 div를 추가한다. 
+      myBody.appendChild(newDiv);
     } 
   </script>
 </head>
-<body>
-  
+<body id="myBody">
+  <h3>DOM 동적 추가/삭제</h3>
+  <a href="javascript:createDOM();">동적생성</a>
 </body>
 </html>
