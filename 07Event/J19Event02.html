@@ -5,13 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>J19Event02.html</title>
   <script>
+    /*
+    이벤트활용2 : window 객체에 이벤트리스너를 부착한다.
+      window객체는 JavaScript의 최상위 객체로 현재 HTML문서를 실행한
+      웹브라우저를 가리킨다. 
+    */
     window.onload = function() {
       alert('해당 문서의 load가 완료되었습니다.');
-
+      /*
+      문서의 로드가 완료된 후 해당 코드가 실행되므로 이 경우에는 문제없이 DOM을 얻어올 수 있다. 
+      */
       var i = document.getElementById('myInput').value;
       alert('i=' + i);
     }
-
+    /*
+    JavaScript는 인터프리터 방식으로 동작하므로 해당 코드가 실행되는 시점에는 정의된 Dom요소가 
+    없으므로 에러가 발생한다.
+    */
     //var i = document.getElementById('myInput').value;
     //alert('i=' + i);
   </script>
