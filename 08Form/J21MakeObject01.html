@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>J21MakeObject01.html</title>
+</head>
+<body>
+  <h2>Object(객체)</h2>
+  <script>
+    console.error("방법1");
+    let person = new Object();
+    person.name = "홍길동";
+    person.age = 10;
+    function myInfo(){
+      return `이름:${this.name}, 나이:${this.age}`;
+    }
+    person.Info = myInfo;
+    console.log(person.Info());
+  </script>
+
+  <script>
+    console.error("방법2");
+    let Account = function(owner, balance){
+      this.owner = owner;
+      this.balance = balance;
+
+      this.accInfo = function(){
+        console.log(`예금주:${this.owner}, 잔액:${this.balance}`);
+      }
+    }
+    var account = new Account("손오공", 25000);
+    account.accInfo();
+  </script>
+
+  <script>
+    console.error("방법3");
+    const car = {
+      name: "테슬라",
+      price: 50000,
+      carInfo1: function(){
+        return `차량명:${this.name}`;
+      },
+      carInfo2: function(){
+        return `가격:${car.price}`;
+      }
+    };
+    console.log(car.carInfo1());
+    console.log(car.carInfo2());
+  </script>
+</body>
+</html>
