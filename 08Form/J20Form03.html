@@ -38,7 +38,7 @@ function choiceOne(flag) {
   if (flag == 1) {
     //과목 부분 전체를 비활성화 
     for (var i = 0; i < f.t1.length; i++) {
-      f.t1[i].disabled = false;
+      f.t1[i].disabled = true;
     }
     //운동 항목 전체를 활성화 
     for (var i = 0; i < f.s1.length; i++) {
@@ -70,15 +70,14 @@ function spoChoice() {
     //체크가 안된 항목을 찾아서 비활성화 한다. 
     for (var i = 0; i < fn.s1.length; i++) {
       if(fn.s1[i].checked == false) {
-        fn.s1[i].checked = true;
+        fn.s1[i].disabled = true;
       }
     }
   }
   else {
     //만약 체크된 항목이 2개 미만이라면 전체를 활성화 시켜준다. 
     for (var i = 0; i < fn.s1.length; i++) {
-      if(fn.s1[i].checked == false) 
-        fn.s1[i].checked = true;
+      fn.s1[i].disabled = false;
     }
   }
 }

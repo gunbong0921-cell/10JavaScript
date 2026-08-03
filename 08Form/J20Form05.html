@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>J20Form05.html</title>
+</head>
+<body>
+  <h2>this, this.form, this.value 사용하기</h2>
+  <script>
+    function formValidate1(param1, param2, param3) {
+      let frm = document.loginFrm;
+      (frm==param1) ? console.log("frm과 param1은 같다.") 
+        : console.log("frm과 param1은 다르다.");
+      console.log("param2 : " + param2.type, param2.value);
+      console.log("param3", param3);
+
+      if (!param1.id.value) {
+        alert("아이디를 입력하세요.");
+        frm.id.focus();
+        return;
+      }
+    }
+    
+    function formValidate2(args) {
+      let frm = document.loginFrm;
+      (args==frm) ? console.log("args와 frm은 같다.") 
+        : console.log("args와 frm은 다르다.");
+      if (args.id.value=="") {
+        alert("아이디를 입력하세요.");
+        frm.id.focus();
+        return false;
+      }
+    }  
+  </script>
+  <form name="loginFrm" onsubmit="return formValidate1(this);">
+    아이디 : <input type="text" name="id" />
+    <br>
+    <input type="button" value="로그인1" onclick="formValidate1(this.form, this, this.value);"/>
+    <input type="button" value="로그인2"/>
+  </form>
+</body>
+</html>
