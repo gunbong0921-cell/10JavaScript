@@ -5,31 +5,54 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>J23WebStorage1.html </title>
   <script>
-    var content, spn1, span2;
+    //변수 선언
+    var content, span1, span2;
     window.onload = function(){
+      //문서의 로드가 완료되면 변수에 문서의 요소를 할당
       content = document.getElementById("content");
       span1 = document.getElementById("visitor1");
       span2 = document.getElementById("visitor2");
 
-      if (typeof(Storage) != undefined){
+      //웹스토리지를 지원하는 브라우저인지 확인
+      if (typeof(Storage) != "undefined"){
         content.innerHTML = "웹스토리지를 지원하는 브라우저입니다.";
-
+        /*
+        로컬스토리지 : 웹브라우저를 닫아도 저장된 정보가 삭제되지 않는 저장소. 따라서 간단한
+          DB처럼 사용할 수 있다. 
+        */
+       //저장된 정보를 읽어옴 
         var visitVar1 = localStorage.getItem("visitCnt1");
         if (visitVar1 == null){
+          //기존에 저장된 값이 없다면 새로운 스토리지 생성 
           localStorage.setItem("visitCnt1", 1);
           span1.innerHTML = "첫 방문자입니다.";
         }
         else{
-          span1.innerHTML = visitVar1 + "번째 방문자입니다.";
+          //기존 저장된 값이 있으면 1증가 후 업데이트 
           visitVar1++;
-          localStorage.setItem("visitCnt2", visitVar2);
+          localStorage.setItem("visitCnt1", visitVar1);
+          span1.innerHTML = visitVar1 + "번째 방문자입니다.";
+        }
+        /*
+        세션스토리지 : 로컬스토리지와 사용ㅂ버은 완전히 동일하다. 단 웹브라우절르 닫으면 저장된 정보가 삭제된다.
+          따라서 접속이 유지된 상태에서만 사용할 수 있는 저장소이다. 
+        */
+        var visitVar2 = sessionStorage.getItem("visitCnt2");
+        if (visitVar2 == null){
+          sessionStorage.setItem("visitCnt2", 1);
+          span2.innerHTML = "첫 방문자입니다.";
+        }
+        else{
+          visitVar2++;
+          sessionStorage.setItem("visitCnt2", visitVar2);
+          span2.innerHTML = visitVar2 + "번째 방문자입니다.";
         }
       }
       else {
         content.innerHTML = "웹스토리지를 지원하지 않는 브라우저입니다.";
       }
     }
-
+    //삭제시에는 removeItem() 메서드를 사용 
     function removeLocal(){
       localStorage.removeItem("visitCnt1");
       span1.innerHTML = "방문횟수가 초기화 되었습니다.";

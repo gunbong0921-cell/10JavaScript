@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>J24CustomVideo.html</title>
+  <script>
+    var video;
+    window.onload = function(){
+      //재생시간을 표시할 프로그래스 엘리먼트의 DOM
+      var currentSpan = document.getElementById("currentTime");
+      var totalSpan = document.getElementById("totalTime");
+      var progress = document.getElementById("progress");
+      //비디오 엘리먼트의 DOM 요소 얻어옴 
+      video = document.getElementById("video");
+      //첫 재생시 볼륨을 50%로 설정 
+      video.volume = 0.5;
+      /*
+      동영상 재생시 지속적으로 발생되는 timeupdate 이벤트를 비디오 DOM에 부착한다. 이를 통해 재생시간에 
+      대한 정보를 실시간으로 받을 수 있다. 
+      */
+      video.addEventListener("timeupdate", function(){
+        //현재 재생시간을 초 단위로 반환 (변환함수 timeShow() 지우면 초단위로 표시됨) 
+        currentSpan.innerHTML = timeShow(video.currentTime);
+        //동영상의 전체 재생시간을 반환
+        totalSpan.innerHTML = timeShow(video.duration);
+
+        //프로그래스 태그의 DOM
+        let progress = document.getElementById("progress");
+        //반환된 시간을 통해 프로그래스바에 설정하여 재생상태를 출력한다. 
+        progress.max = video.duration; //총 재생시간
+        progress.value = video.currentTime; //현재 재생시간
+      });
+    }
+    //비디오 재생 
+    function play(){
+      /*
+      hidden 속성은 화면을 숨김처리 할때 사용. true를 부여하면 화면이 숨김처리되고, false를 부여하면 보임처리됨.
+      */
+      video.hidden = "";
+      video.play();
+    }
+    //일시정지 
+    function stop(){
+      //ture는 화면을 숨김상태로 전환(필요할때만 사용하는게 좋음)
+      //숨김처리 하지 않을때는 빈값 ""; 부여하면 보임처리됨.
+      video.hidden = true;
+      video.pause();
+    }
+    //처음부터 다시 재생 
+    function start(){
+      //currentTime 속성은 현재 재생시간을 설정하거나 반환하는 속성. 0을 부여하면 처음부터 재생됨.
+      video.currentTime = 0;
+      video.play();
+    }
+    /*
+    timupdate 이벤트를 통해 반환되는 재생시간은 123.xxx와 같이 초단위로 표현되므로, 가독성을 위해
+    00:00:00 형식으로 변환하여 반환한다.
+    */
+    function timeShow(seconds){
+      //소수점 형식으로 반환되는 시간을 반올림 처리 
+      seconds = Math.round(seconds);
+      //시간 계산 
+      var h = parseInt(seconds / 3600);
+      //분 계산 
+      var m = parseInt((seconds % 3600) / 60);
+      //초 계산 
+      var s = seconds % 60;
+      /*
+      시간이 10 미만일때는 0:0:0과 같이 출력될 수 있으므로 문자열 0을 추가하여 두가지의 포맷을 만들어준다. 
+      */
+      var hour = (h < 10) ? "0" + h : h;
+      var min = (m < 10) ? "0" + m : m;
+      var sec = (s < 10) ? "0" + s : s;
+
+      return hour + ":" + min + ":" + sec;
+    }
+    //불륨조절 : 0~1사이로 조절 가능 
+    function setVolume(vol){
+      if (vol == 0){
+        //볼륨이 0이면 음소거 처리 
+        video.muted = true;
+      }
+      else{
+        //0이 아니면 음소거 해제 
+        video.muted = false;
+        var nowVolume = video.volume;
+        //0~1 범위를 벗어나면 강제로 맞춤 설정한다. 
+        if (vol == 1){
+          nowVolume += 0.1;
+          video.volume = (nowVolume > 1) ? 1 : nowVolume;
+        }
+        else{
+          nowVolume -= 0.1;
+          video.volume = (nowVolume < 0) ? 0 : nowVolume;
+        }
+      }
+    }
+    //재생 속도 조절 
+    function setPlaybackRate(value){
+      if (value == 1){
+        video.playbackRate += 0.25;
+      }
+      else{
+        video.playbackRate -= 0.25;
+      }
+    }
+    //건너뛰기 설정 
+    function setTime(value){
+      //10초씩 앞/뒤로 이동 
+      if (value == 1){
+        video.currentTime += 10;
+      }
+      else{
+        video.currentTime -= 10;
+      }
+    }
+  </script>
+  <style>
+    div {
+      border: 1px solid red;
+      width: 300px;
+    }
+    input {
+      position: relative;	z-index: 2; height: 40px; line-height: 35px;
+      background-color: #333;	border: 2px solid #333;
+      color: #fff;
+    }
+    input:hover {
+      background-color: #fff; border-color: #59b1eb; color: #59b1eb;
+    }
+    input::before, input::after {
+      top: 0; width: 50%; height: 100%;
+      background-color: #333;
+    }
+    input:hover::before, input:hover::after {
+      width: 0; background-color: #59b1eb;
+    }
+  </style>
+</head>
+<body>
+  <h2>javascript를 이용한 커스텀 비디오 만들기</h2>
+  <div>
+    <!-- poster 속성으로 영상 재생 전 썸네일 이미지를 표현할 수 있다. -->
+    <video id="video" width="300" height="200" src="./media/video.mp4" muted autoplay controls poster="./images/html5.png"></video>
+    <!-- controls muted autoplay -->
+  </div>
+  <div>
+    <!-- 영상 재생시 현재 상태를 보여줌 -->
+    <span id="currentTime"></span> / <span id="totalTime"></span>
+    <progress id="progress" value="0" max="100"></progress>
+  </div>
+  <!-- 현재재생시간 / 전체재생시간 -->
+  <input type="button" value="재생하기" onclick="play();">
+  <input type="button" value="일시정지" onclick="stop();">
+  <input type="button" value="처음부터재생하기" onclick="start();">
+  <input type="button" value="볼륨+" onclick="setVolume(1);">
+  <input type="button" value="볼륨-" onclick="setVolume(-1);">
+  <input type="button" value="음소거" onclick="setVolume(0);">
+  <input type="button" value="재생속도+" onclick="setPlaybackRate(1);">
+  <input type="button" value="재생속도-" onclick="setPlaybackRate(-1);">
+  <input type="button" value="10초앞으로" onclick="setTime(1);">
+  <input type="button" value="10초뒤로" onclick="setTime(-1);">
+</body>
+</html>

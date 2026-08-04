@@ -8,7 +8,12 @@
     var setCookie = function(name, value, exp){
       var date = new Date();
       date.setTime(date.getTime() + (exp*24*60*60*1000));
-      document.cookie = name + "=" + value + "; expires=" + date.toUTCString() + "; path=/";
+      // file:// 로 열면 path=/ 때문에 쿠키가 저장되지 않을 수 있음
+      var cookie = name + "=" + value + "; expires=" + date.toUTCString();
+      if(location.protocol !== "file:"){
+        cookie += "; path=/";
+      }
+      document.cookie = cookie;
     };
     var getCookie = function(name){
       var values = document.cookie.split("; ");
@@ -54,12 +59,35 @@
       setCookie("popupClose", "Y", 1);
       document.getElementById("popupWin").style.display = "none";
     }
-
+  
     window.onload = function(){
+      var popupWin = document.getElementById("popupWin");
       if(getCookie("popupClose") != null){
-        document.getElementById("popupWin").style.display = "none";
+        popupWin.style.display = "none";
+      } else {
+        popupWin.style.display = "block";
       }
     };
+    //문서의 로드가 완료되면 쿠키를 읽어서 레이어 팝업창을 제어한다.   
+    //window.onload = function(){
+    // 팝업창 제어를 위한 쿠키를 읽어서 변수에 저장
+    // let popupWinCookie = getCookie("popup");
+    // div로 만든 팝업창의 DOM객체를 가져온다.
+    // let popupWin = document.getElementById("popupWin");
+    // 쿠키값이 off라면 팝업창을 숨김처리한다.
+    // if(popupWinCookie == "off"){
+    //   popupWin.style.display = "none";
+    //} else {
+    //   popupWin.style.display = "block";
+    //}
+    // 레이어 팝업창의 체크박스를 클릭하면 호출
+    // const closeWin = () => {
+    //  유효기간 1일인 쿠키 생성. 쿠키값:popuo, 값:off
+    //  setCookie("popup", "off", 1);
+    //  팝업창을 숨김처리한다.
+    //  document.getElementById("popupWin").style.display = "none";
+    //  display속성을 none으로 변경하여 팝업창을 숨김처리한다.
+    //}
   </script>
 </head>
 <style>
@@ -89,7 +117,9 @@
     본문의 내용은 이와 같습니다. <br>
     본문의 내용은 이와 같습니다. <br>
   </p>
-  <div class="popupWin" id="popupWin" style="display:block;">
+  <!-- display를 block으로 설정하면 문서가 로드되었을때 보임처리 되었다가 쿠키를 통해 숨김처리하게
+   되므로 깜박이는 현상이 생긴다. 따라서 처음부터 none으로 설정하여 깜박이는 현상을 방지한다. -->
+  <div class="popupWin" id="popupWin" style="display:none;">
     오늘의 팝업창
     <br>
     <input type="checkbox" id="popChk" onclick="closeWin();"> 오늘하루열지않음
