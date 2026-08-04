@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>J25CustomAudio3.html</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", sans-serif;
+      /* 여름 노을 하늘 : 보라 -> 붉은 노을 -> 주황 -> 수평선의 금빛 */
+      background: linear-gradient(180deg,
+        #2b1a4e 0%,
+        #6a2c70 25%,
+        #c94b6a 45%,
+        #f0704f 58%,
+        #ffb347 68%,
+        #ffd98a 72%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow: hidden;
+    }
+    /* ---------- 노을 해변 배경 ---------- */
+    .scene {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    /* 태양 : 수평선 위에서 은은하게 숨쉬듯 빛남 */
+    .sun {
+      position: absolute;
+      left: 50%;
+      top: 46%;
+      width: 180px;
+      height: 180px;
+      margin-left: -90px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff6d8 0%, #ffd98a 35%, #ff9d5c 70%, rgba(255, 140, 80, 0) 100%);
+      box-shadow: 0 0 120px 60px rgba(255, 170, 90, 0.45);
+      animation: sunGlow 6s ease-in-out infinite;
+    }
+    @keyframes sunGlow {
+      0%, 100% { transform: scale(1); opacity: 0.95; }
+      50% { transform: scale(1.06); opacity: 1; }
+    }
+    /* 구름 : 천천히 흘러가는 노을빛 구름 */
+    .cloud {
+      position: absolute;
+      background: rgba(255, 190, 150, 0.35);
+      border-radius: 100px;
+      filter: blur(18px);
+    }
+    .cloud1 {
+      width: 320px;
+      height: 46px;
+      top: 18%;
+      animation: drift 55s linear infinite;
+    }
+    .cloud2 {
+      width: 220px;
+      height: 34px;
+      top: 30%;
+      background: rgba(255, 150, 130, 0.3);
+      animation: drift 75s linear infinite;
+      animation-delay: -30s;
+    }
+    .cloud3 {
+      width: 420px;
+      height: 56px;
+      top: 8%;
+      background: rgba(200, 120, 160, 0.28);
+      animation: drift 95s linear infinite;
+      animation-delay: -60s;
+    }
+    @keyframes drift {
+      from { left: -450px; }
+      to { left: 110%; }
+    }
+    /* 바다 : 화면 하단, 노을이 반사된 색 */
+    .sea {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 30%;
+      background: linear-gradient(180deg,
+        #e8956a 0%,
+        #b05a6e 18%,
+        #5d3a6e 55%,
+        #2b2350 100%);
+    }
+    /* 태양의 물비침 : 일렁이는 빛기둥 */
+    .sun-reflection {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 130px;
+      height: 30%;
+      margin-left: -65px;
+      background: linear-gradient(180deg,
+        rgba(255, 220, 150, 0.55) 0%,
+        rgba(255, 180, 110, 0.25) 45%,
+        rgba(255, 180, 110, 0) 100%);
+      filter: blur(6px);
+      animation: shimmer 4s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0%, 100% { transform: scaleX(1); opacity: 0.8; }
+      50% { transform: scaleX(1.35); opacity: 1; }
+    }
+    /* 파도 : 두 겹의 물결이 서로 다른 속도로 흐름 */
+    .wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 200%;
+      height: 130px;
+      background-repeat: repeat-x;
+      background-size: 50% 100%;
+    }
+    .wave1 {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 130' preserveAspectRatio='none'%3E%3Cpath d='M0,60 C150,110 350,10 600,60 C850,110 1050,10 1200,60 L1200,130 L0,130 Z' fill='%233a2a5e' fill-opacity='0.85'/%3E%3C/svg%3E");
+      animation: waveMove 14s linear infinite;
+      opacity: 0.9;
+    }
+    .wave2 {
+      height: 90px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 90' preserveAspectRatio='none'%3E%3Cpath d='M0,45 C200,85 400,5 600,45 C800,85 1000,5 1200,45 L1200,90 L0,90 Z' fill='%23241c48' fill-opacity='0.95'/%3E%3C/svg%3E");
+      animation: waveMove 9s linear infinite reverse;
+    }
+    @keyframes waveMove {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    .player {
+      position: relative;
+      z-index: 1;
+      width: 380px;
+      background: rgba(30, 20, 50, 0.35);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 32px 28px 24px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+      color: #fff;
+    }
+    /* ---------- 앨범아트 ---------- */
+    .artwork {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 28px;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #ffb347, #f0704f, #c94b6a, #6a2c70);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 16px 40px rgba(201, 75, 106, 0.4);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    .artwork svg {
+      width: 72px;
+      height: 72px;
+      fill: rgba(255, 255, 255, 0.9);
+    }
+    .player.playing .artwork {
+      transform: scale(1.03);
+      box-shadow: 0 20px 50px rgba(240, 112, 79, 0.6);
+    }
+    /* ---------- 곡 정보 ---------- */
+    .track-info {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .track-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .track-artist {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 4px;
+    }
+    /* ---------- 진행바 ---------- */
+    .progress-area {
+      margin-bottom: 8px;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 3px;
+      cursor: pointer;
+      position: relative;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #fff;
+      border-radius: 3px;
+      position: relative;
+      transition: background 0.2s;
+    }
+    .progress-bar:hover .progress-fill {
+      background: #fa586a;
+    }
+    .progress-fill::after {
+      content: "";
+      position: absolute;
+      right: -5px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #fff;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .progress-bar:hover .progress-fill::after {
+      opacity: 1;
+    }
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.45);
+      margin-top: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+    /* ---------- 컨트롤 버튼 ---------- */
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      margin: 18px 0 22px;
+    }
+    .controls button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    .controls button:hover {
+      transform: scale(1.1);
+    }
+    .controls button:active {
+      transform: scale(0.95);
+    }
+    .btn-skip svg {
+      width: 26px;
+      height: 26px;
+      fill: rgba(255, 255, 255, 0.85);
+    }
+    .btn-play {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #fff !important;
+      box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+    }
+    .btn-play svg {
+      width: 26px;
+      height: 26px;
+      fill: #16213e;
+    }
+    /* ---------- 볼륨 ---------- */
+    .volume-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+      padding: 0 8px;
+    }
+    .volume-area svg {
+      width: 16px;
+      height: 16px;
+      fill: rgba(255, 255, 255, 0.45);
+      flex-shrink: 0;
+    }
+    .volume-bar {
+      flex: 1;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 2px;
+      cursor: pointer;
+    }
+    .volume-fill {
+      height: 100%;
+      width: 70%;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 2px;
+    }
+    /* ---------- 플레이리스트 ---------- */
+    .playlist-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 10px;
+      padding: 0 8px;
+    }
+    .playlist {
+      list-style: none;
+    }
+    .playlist li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .playlist li:hover {
+      background: rgba(255, 255, 255, 0.07);
+    }
+    .playlist li.active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .playlist .num {
+      width: 18px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    .playlist li.active .num {
+      color: #fa586a;
+    }
+    .playlist .meta {
+      flex: 1;
+      min-width: 0;
+    }
+    .playlist .meta .t {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .playlist .meta .a {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.45);
+      margin-top: 2px;
+    }
+    /* 재생중 이퀄라이저 표시 */
+    .eq {
+      display: none;
+      align-items: flex-end;
+      gap: 2px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+    .playlist li.active.playing .eq {
+      display: flex;
+    }
+    .eq span {
+      width: 3px;
+      background: #fa586a;
+      border-radius: 1px;
+      animation: bounce 1s ease-in-out infinite;
+    }
+    .eq span:nth-child(1) { height: 60%; animation-delay: 0s; }
+    .eq span:nth-child(2) { height: 100%; animation-delay: 0.2s; }
+    .eq span:nth-child(3) { height: 40%; animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 100% { transform: scaleY(0.4); }
+      50% { transform: scaleY(1); }
+    }
+  </style>
+  <script type="text/javascript">
+    //재생할 곡 목록(경로, 제목, 아티스트)
+    var tracks = [
+      { src: "./media/I_Remember_You.mp3", title: "I Remember You", artist: "Skid Row" },
+      { src: "./media/Kissing_A-Fool.mp3", title: "Kissing A Fool", artist: "George Michael" },
+      { src: "./media/When_I_First-Kissed_You.mp3", title: "When I First Kissed You", artist: "Extreme" }
+    ];
+    var audio;
+    var index = 0;
+    var isPlaying = false;
+
+    window.onload = function () {
+      audio = document.getElementById("audio");
+      audio.volume = 0.7;
+
+      //곡 정보만 미리 표시(재생은 하지 않음)
+      loadTrack(index);
+
+      //재생 시간이 갱신될 때마다 진행바와 시간 표시 업데이트
+      audio.ontimeupdate = function () {
+        if (!audio.duration) return;
+        var percent = (audio.currentTime / audio.duration) * 100;
+        document.getElementById("progressFill").style.width = percent + "%";
+        document.getElementById("curTime").innerHTML = formatTime(audio.currentTime);
+      };
+      //메타데이터 로딩 완료시 전체 재생시간 표시
+      audio.onloadedmetadata = function () {
+        document.getElementById("durTime").innerHTML = formatTime(audio.duration);
+      };
+      //재생 완료시 다음 곡으로 자동 전환(연속재생)
+      audio.onended = function () {
+        nextTrack();
+      };
+    };
+
+    //초 단위를 m:ss 형태의 문자열로 변환
+    function formatTime(sec) {
+      var m = Math.floor(sec / 60);
+      var s = Math.floor(sec % 60);
+      return m + ":" + (s < 10 ? "0" + s : s);
+    }
+
+    //index에 해당하는 곡을 로드하고 화면 표시를 갱신
+    function loadTrack(idx) {
+      index = idx;
+      audio.src = tracks[idx].src;
+      document.getElementById("trackTitle").innerHTML = tracks[idx].title;
+      document.getElementById("trackArtist").innerHTML = tracks[idx].artist;
+      document.getElementById("progressFill").style.width = "0%";
+      document.getElementById("curTime").innerHTML = "0:00";
+      //플레이리스트에서 현재 곡 강조
+      var items = document.querySelectorAll(".playlist li");
+      for (var i = 0; i < items.length; i++) {
+        items[i].classList.remove("active", "playing");
+      }
+      items[idx].classList.add("active");
+      if (isPlaying) items[idx].classList.add("playing");
+    }
+
+    //재생/일시정지 토글
+    function togglePlay() {
+      if (isPlaying) {
+        audio.pause();
+        isPlaying = false;
+      }
+      else {
+        audio.play();
+        isPlaying = true;
+      }
+      updatePlayState();
+    }
+
+    //재생 상태에 따라 아이콘과 애니메이션 갱신
+    function updatePlayState() {
+      document.getElementById("iconPlay").style.display = isPlaying ? "none" : "block";
+      document.getElementById("iconPause").style.display = isPlaying ? "block" : "none";
+      var player = document.getElementById("player");
+      var activeItem = document.querySelectorAll(".playlist li")[index];
+      if (isPlaying) {
+        player.classList.add("playing");
+        activeItem.classList.add("playing");
+      }
+      else {
+        player.classList.remove("playing");
+        activeItem.classList.remove("playing");
+      }
+    }
+
+    //다음 곡 재생(마지막 곡이면 처음으로 순환)
+    function nextTrack() {
+      loadTrack((index + 1) % tracks.length);
+      audio.play();
+      isPlaying = true;
+      updatePlayState();
+    }
+
+    //이전 곡 재생. 3초 이상 재생중이면 현재 곡을 처음부터 다시 재생
+    function prevTrack() {
+      if (audio.currentTime > 3) {
+        audio.currentTime = 0;
+        return;
+      }
+      loadTrack((index - 1 + tracks.length) % tracks.length);
+      audio.play();
+      isPlaying = true;
+      updatePlayState();
+    }
+
+    //플레이리스트에서 곡을 클릭했을 때 해당 곡 재생
+    function selectTrack(idx) {
+      loadTrack(idx);
+      audio.play();
+      isPlaying = true;
+      updatePlayState();
+    }
+
+    //진행바 클릭시 해당 위치로 이동
+    function seek(e) {
+      if (!audio.duration) return;
+      var bar = document.getElementById("progressBar");
+      var rect = bar.getBoundingClientRect();
+      var ratio = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = ratio * audio.duration;
+    }
+
+    //볼륨바 클릭시 볼륨 조절
+    function setVolume(e) {
+      var bar = document.getElementById("volumeBar");
+      var rect = bar.getBoundingClientRect();
+      var ratio = (e.clientX - rect.left) / rect.width;
+      ratio = Math.max(0, Math.min(1, ratio));
+      audio.volume = ratio;
+      document.getElementById("volumeFill").style.width = (ratio * 100) + "%";
+    }
+  </script>
+</head>
+<body>
+  <audio id="audio"></audio>
+
+  <!-- 노을 해변 배경 -->
+  <div class="scene">
+    <div class="cloud cloud3"></div>
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+    <div class="sun"></div>
+    <div class="sea"></div>
+    <div class="sun-reflection"></div>
+    <div class="wave wave1"></div>
+    <div class="wave wave2"></div>
+  </div>
+
+  <div class="player" id="player">
+    <!-- 앨범아트 -->
+    <div class="artwork">
+      <svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
+    </div>
+
+    <!-- 곡 정보 -->
+    <div class="track-info">
+      <div class="track-title" id="trackTitle">-</div>
+      <div class="track-artist" id="trackArtist">-</div>
+    </div>
+
+    <!-- 진행바 -->
+    <div class="progress-area">
+      <div class="progress-bar" id="progressBar" onclick="seek(event);">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="time-row">
+        <span id="curTime">0:00</span>
+        <span id="durTime">0:00</span>
+      </div>
+    </div>
+
+    <!-- 컨트롤 -->
+    <div class="controls">
+      <button type="button" class="btn-skip" onclick="prevTrack();" title="이전 곡">
+        <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6V6zm3.5 6l8.5 6V6l-8.5 6z"/></svg>
+      </button>
+      <button type="button" class="btn-play" onclick="togglePlay();" title="재생/일시정지">
+        <svg id="iconPlay" viewBox="0 0 24 24" style="margin-left:3px;"><path d="M8 5v14l11-7L8 5z"/></svg>
+        <svg id="iconPause" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+      <button type="button" class="btn-skip" onclick="nextTrack();" title="다음 곡">
+        <svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2V6zM6 18l8.5-6L6 6v12z"/></svg>
+      </button>
+    </div>
+
+    <!-- 볼륨 -->
+    <div class="volume-area">
+      <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.47 4.47 0 0 0 16.5 12z"/></svg>
+      <div class="volume-bar" id="volumeBar" onclick="setVolume(event);">
+        <div class="volume-fill" id="volumeFill"></div>
+      </div>
+    </div>
+
+    <!-- 플레이리스트 -->
+    <div class="playlist-label">Playlist</div>
+    <ul class="playlist">
+      <li onclick="selectTrack(0);">
+        <span class="num">1</span>
+        <div class="meta">
+          <div class="t">I Remember You</div>
+          <div class="a">Skid Row</div>
+        </div>
+        <div class="eq"><span></span><span></span><span></span></div>
+      </li>
+      <li onclick="selectTrack(1);">
+        <span class="num">2</span>
+        <div class="meta">
+          <div class="t">Kissing A Fool</div>
+          <div class="a">George Michael</div>
+        </div>
+        <div class="eq"><span></span><span></span><span></span></div>
+      </li>
+      <li onclick="selectTrack(2);">
+        <span class="num">3</span>
+        <div class="meta">
+          <div class="t">When I First Kissed You</div>
+          <div class="a">Extreme</div>
+        </div>
+        <div class="eq"><span></span><span></span><span></span></div>
+      </li>
+    </ul>
+  </div>
+</body>
+</html>
